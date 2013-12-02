@@ -8,16 +8,17 @@ var annualPercentages = {
 }
 
 
-var annualPercentage = 4
+var annualPercentage =6
 var monthlyGainPercent = annualPercentages[annualPercentage]
 var monthlyIncome = 4000 // after tax
-var monthlyCosts = 2300
+var monthlyCosts = 3000
 var annualGainTax = 40 // percent
 
-var investAccount = 50000
+var investAccount = 0
 var checkingAccount = 0
-var annualInvestPercent = 50 // percent of checking account to invest at end of year
-var annualRaisePercent = 5 // percent
+var annualInvestPercent = 60 // percent of checking account to invest at end of year
+var annualRaisePercent = 4 // percent
+var annualCostIncreasePercent = 2 // percent
 var stopWorkAfterYears = 35 // years to pension
 
 var years = 40
@@ -30,9 +31,11 @@ console.log('Simulation for', years, 'years of work,', 'starting with:',
 	'\n\t', money(investAccount)+' invested with ', annualPercentage+'% annual return',
 	'\n\t', annualGainTax+'% annual capital gains tax',
 	'\n\t', annualInvestPercent+'% of leftover checking invested each year',
+	'\n\t', annualRaisePercent+'% raise per year',	
+	'\n\t', annualCostIncreasePercent+'% increase in annual costs',
 	'\n============')
 
-log('Year\tSalary\t\tChecking Acc\tInvest Acc\tInvest New\tNew Salary (raised)\tCapital Gains Tax')
+log('Year\t$ Made\t\t$ Spent\t\tChecking Acc\tInvest This\tAfter Invest\tRetirmnt fund\tNew Salary (raised)\tCapital Gains Tax')
 
 for (var year=0; year<years; year++) {
 	var startOfYearInvestment = investAccount
@@ -56,6 +59,7 @@ function iterateYear(year, startOfYearInvestment) {
 	var eoyIncome = money(monthlyIncome*12)
 	var eoyCheckingAcc = money(checkingAccount)
 	var eoyInvestAcc = money(investAccount)
+	var eoySpent = money(monthlyCosts*12)
 	
 	var raise = monthlyIncome * annualRaisePercent/100
 	monthlyIncome += raise
@@ -63,33 +67,19 @@ function iterateYear(year, startOfYearInvestment) {
 	checkingAccount -= investAmount
 	investAccount += investAmount
 	investAccount -= tax
+	monthlyCosts *= (1+annualCostIncreasePercent/100)
 
 	var eoyInvestedAmount = money(investAmount)
 	var eoyNewIncome = money(monthlyIncome * 12)
 	var eoyRaise = money(raise * 12)
+	var eoyCheckingAfterInvest = money(checkingAccount)
 
 	if (year % reportEvery == 0) {
 		log(year,
-			eoyIncome, eoyCheckingAcc, eoyInvestAcc,
-			eoyInvestedAmount, eoyNewIncome + '    ('+eoyRaise+')',
+			eoyIncome, eoySpent, eoyCheckingAcc, eoyInvestedAmount, eoyCheckingAfterInvest, 
+			eoyInvestAcc, eoyNewIncome + '    ('+eoyRaise+')',
 			money(tax))
 	}
-	
-	
-	// log('\t', money(investAmount),
-	// 	'\t', money(monthlyIncome*12),
-	// 	'\t', money(raise*12))
-
-	// if (year == stopWorkAfterYears) {
-	// 	log("Reached pension")
-	// 	monthlyIncome = 0
-	// }
-	// if (year >= stopWorkAfterYears) {
-	// 	log("")
-	// 	investAccount
-	// }
-	// console.log("Yr", year+'\t', commas())
-	// console.log("Invest ")	
 }
 
 function log() {
